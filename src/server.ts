@@ -7,12 +7,13 @@ import { validateInput } from './validation'
 
 const server = express()
 const PORT = parseInt(process.env.PORT as string) || 8080
+
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY as string
+  apiKey: process.env.OPENAI_API_KEY as string,
 })
 
 /**
- * START.
+ * START Zod schema stuff.
  * Create a zod schema which will be used when sanitizing the user input.
  */
 const chatInputSchema = z.object({
@@ -26,12 +27,23 @@ const chatInputSchema = z.object({
 
 type ChatInput = z.infer<typeof chatInputSchema>
 /**
- * END.
+ * END Zod schema stuff.
  */
 
+
+/**
+ * Start Middleware
+ */
 server.use(cors())
 server.use(express.json())
+/**
+ * End Middleware
+ */
 
+
+/**
+ * Start API Routes
+ */
 server.get('/healthz', (_req, res) => {
   res.status(200).json({ msg: 'Health OK!' })
 })
@@ -54,6 +66,10 @@ server.post('/api/v1/chat', validateInput(chatInputSchema), async (
     res.status(500).json({ msg: 'Internal Server Error.' })
   }
 })
+/**
+ * End API Routes
+ */
+
 
 /**
  * Main function that starts the express server.
