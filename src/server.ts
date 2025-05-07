@@ -1,23 +1,42 @@
 import 'dotenv/config'
 import express, { Request, Response } from 'express'
+import z from 'zod'
+import cors from 'cors'
 import OpenAI from 'openai'
 import { validateInput } from './validation'
-import { ChatInput, chatInput } from './schema'
 
 const server = express()
 const PORT = parseInt(process.env.PORT as string) || 8080
-
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY as string
 })
 
+/**
+ * START.
+ * Create a zod schema which will be used when sanitizing the user input.
+ */
+const chatInputSchema = z.object({
+  body: z.object({
+    input: z
+      .string({ required_error: 'Please provide a prompt.' })
+      .min(2, 'Prompt must be at least 2 letters.')
+    }
+  )
+})
+
+type ChatInput = z.infer<typeof chatInputSchema>
+/**
+ * END.
+ */
+
+server.use(cors())
 server.use(express.json())
 
 server.get('/healthz', (_req, res) => {
   res.status(200).json({ msg: 'Health OK!' })
 })
 
-server.post('/api/v1/chat', validateInput(chatInput), async (
+server.post('/api/v1/chat', validateInput(chatInputSchema), async (
   req: Request<{}, {}, ChatInput['body']>,
   res: Response
 ) => {
@@ -29,13 +48,17 @@ server.post('/api/v1/chat', validateInput(chatInput), async (
     })
     res.status(200).json(results.output_text)
   } catch (error) {
-    // @ts-expect-error error is not defined.
-    console.error('An error occurred.', error.message)
-    res.status(500).json({ msg: 'Something went wrong.' })
+    if (error instanceof Error) {
+      console.error('An error occurred.', error.message)
+    }
+    res.status(500).json({ msg: 'Internal Server Error.' })
   }
 })
 
-function main() {
+/**
+ * Main function that starts the express server.
+ */
+function main(): void {
   server.listen(PORT, () => {
     console.log(`server started on http://localhost:${PORT}`)
   })
