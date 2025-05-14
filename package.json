@@ -19,7 +19,10 @@
     "mongoose": "^8.14.2",
     "multer": "^1.4.5-lts.2",
     "openai": "^4.96.0",
+    "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^5.2.133",
+    "pdfreader": "^3.0.7",
     "zod": "^3.24.3"
   },
   "devDependencies": {
@@ -27,8 +30,9 @@
     "@types/express": "^5.0.1",
     "@types/glob": "^8.1.0",
     "@types/multer": "^1.4.12",
-    "@types/node": "^22.15.3",
+    "@types/node": "^22.15.18",
     "@types/pdf-parse": "^1.1.5",
+    "@types/pdfjs-dist": "^2.10.378",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   }

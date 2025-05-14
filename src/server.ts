@@ -8,6 +8,7 @@ import pdf from 'pdf-parse'
 import { validateInput } from '../utils/validation'
 import { connectDatabase } from '../utils/database'
 import { upload } from '../utils/upload'
+import { PdfReader } from 'pdfreader'
 
 const server = express()
 const PORT = parseInt(process.env.PORT as string) || 8080
@@ -42,18 +43,21 @@ server.get('/healthz', (_req, res) => {
 server.post('/api/v1/upload', upload.single('file'), async (req, res) => {
   try {
     const file = req.file
-    const uploaded = fs.readFileSync(`./uploads/${file?.filename}`, 'utf-8')
 
-    if (uploaded) {
-      const buffer = Buffer.from(uploaded)
-      console.log(buffer)
+    fs.readFile(`./uploads/${file?.filename}`, (err, pdfBuffer) => {
+      if (err) console.error('Error reading file:', err.message)
 
-      const data = await pdf(buffer)
-      // console.log(data.text)
+      new PdfReader().parseBuffer(pdfBuffer, (err, item) => {
+        if (err) console.error('Error reading PDF file:', err)
+        else if (!item) console.warn('End of buffer.')
+        else if (item.text) {
+          console.log(item.text)
+          // TODO: save data in database
+        };
+      })
+    })
 
-      // TODO: save the text in database 
-      res.status(200).json({ msg: 'File read successfully' })
-    }
+    res.status(200).json({ msg: 'Finished reading PDF file.' })
   } catch (error) {
     if (error instanceof Error) {
       console.error('An error occurred.', error.message)
