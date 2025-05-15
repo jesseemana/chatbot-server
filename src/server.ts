@@ -12,7 +12,6 @@ import { validateInput } from './middleware/validation'
 
 const server = express()
 const PORT = parseInt(process.env.PORT as string) || 8080
-
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY as string,
 })
@@ -35,7 +34,6 @@ server.post('/api/v1/upload', upload.single('file'), async (
     fs.readFile(`./uploads/${file?.filename}`, (err, pdfBuffer) => {
       if (err) console.error('Error reading file:', err.message)
       pdf(pdfBuffer).then(async (data) => {
-        console.log(data.text)
         const pdf_text = await savePDFAsText({ content: data.text })
         res.status(201).json({ pdf_text })
       })
