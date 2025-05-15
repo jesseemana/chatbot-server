@@ -1,4 +1,5 @@
-import mongoose from 'mongoose'
+import mongoose, { InferSchemaType } from 'mongoose'
+
 
 export const connectDatabase = async () => {
   try {
@@ -12,26 +13,3 @@ export const connectDatabase = async () => {
     process.exit(1)
   }
 }
-
-const markdownSchema = new mongoose.Schema({
-  filename: {
-    type: String,
-    unique: true,
-    required: true,
-  },
-  title: String,
-  content: {
-    type: String,
-    required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
-})
-
-export const MarkdownDoc = mongoose.model('MarkdownDoc', markdownSchema)

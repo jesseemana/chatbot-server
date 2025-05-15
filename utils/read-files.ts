@@ -1,8 +1,8 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { MarkdownDoc } from './database'
 import glob from 'glob'
 import { promisify } from 'util'
+import { MarkdownDoc } from '../src/services/markdown.service'
 
 // @ts-ignore
 const globPromise = promisify(glob)

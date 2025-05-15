@@ -5,10 +5,10 @@ import z from 'zod'
 import OpenAI from 'openai'
 import fs from 'fs'
 import pdf from 'pdf-parse'
-import { validateInput } from '../utils/validation'
+import { validateInput } from './middleware/validation'
 import { connectDatabase } from '../utils/database'
-import { upload } from '../utils/upload'
-import { PdfReader } from 'pdfreader'
+import { upload } from './middleware/upload'
+import { savePDFDocument } from './services/pdf.service'
 
 const server = express()
 const PORT = parseInt(process.env.PORT as string) || 8080
@@ -40,24 +40,21 @@ server.get('/healthz', (_req, res) => {
   res.status(200).json({ msg: 'Health OK!' })
 })
 
-server.post('/api/v1/upload', upload.single('file'), async (req, res) => {
+server.post('/api/v1/upload', upload.single('file'), async (
+  req: Request,
+  res: Response
+) => {
   try {
     const file = req.file
 
     fs.readFile(`./uploads/${file?.filename}`, (err, pdfBuffer) => {
       if (err) console.error('Error reading file:', err.message)
-
-      new PdfReader().parseBuffer(pdfBuffer, (err, item) => {
-        if (err) console.error('Error reading PDF file:', err)
-        else if (!item) console.warn('End of buffer.')
-        else if (item.text) {
-          console.log(item.text)
-          // TODO: save data in database
-        };
+      pdf(pdfBuffer).then(async data => {
+        console.log(data.text)
+        const results = await savePDFDocument({ content: 'Hello world.' })
+        res.status(200).json({ txt: results })
       })
     })
-
-    res.status(200).json({ msg: 'Finished reading PDF file.' })
   } catch (error) {
     if (error instanceof Error) {
       console.error('An error occurred.', error.message)
