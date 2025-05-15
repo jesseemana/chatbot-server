@@ -1,10 +1,9 @@
-import mongoose, { InferSchemaType } from 'mongoose'
-
+import mongoose from 'mongoose'
 
 export const connectDatabase = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI as string, {
-      dbName: 'Mark Down',
+      dbName: 'MarkDown',
       maxPoolSize: 10,
     })
     console.log('Database Connected!!!')

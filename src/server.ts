@@ -8,7 +8,7 @@ import pdf from 'pdf-parse'
 import { validateInput } from './middleware/validation'
 import { connectDatabase } from '../utils/database'
 import { upload } from './middleware/upload'
-import { savePDFDocument } from './services/pdf.service'
+import { savePDFAsText } from './services/pdf.service'
 
 const server = express()
 const PORT = parseInt(process.env.PORT as string) || 8080
@@ -46,12 +46,11 @@ server.post('/api/v1/upload', upload.single('file'), async (
 ) => {
   try {
     const file = req.file
-
     fs.readFile(`./uploads/${file?.filename}`, (err, pdfBuffer) => {
       if (err) console.error('Error reading file:', err.message)
       pdf(pdfBuffer).then(async data => {
         console.log(data.text)
-        const results = await savePDFDocument({ content: 'Hello world.' })
+        const results = await savePDFAsText({ content: data.text })
         res.status(200).json({ txt: results })
       })
     })
