@@ -1,14 +1,14 @@
 import 'dotenv/config'
 import express, { Request, Response } from 'express'
 import cors from 'cors'
-import z from 'zod'
 import OpenAI from 'openai'
 import fs from 'fs'
 import pdf from 'pdf-parse'
-import { validateInput } from './middleware/validation'
 import { connectDatabase } from '../utils/database'
-import { upload } from './middleware/upload'
 import { savePDFAsText } from './services/pdf.service'
+import { chatSchema, ChatInput } from '../utils/schema'
+import { upload } from './middleware/upload'
+import { validateInput } from './middleware/validation'
 
 const server = express()
 const PORT = parseInt(process.env.PORT as string) || 8080
@@ -16,20 +16,6 @@ const PORT = parseInt(process.env.PORT as string) || 8080
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY as string,
 })
-
-// The Zod schema definition
-const chatInputSchema = z.object({
-  body: z.object({
-    input: z
-      .string({
-        required_error: 'Please provide a prompt.'
-      })
-      .min(2, 'Prompt must be at least 2 letters.')
-    }
-  )
-})
-
-type ChatInput = z.infer<typeof chatInputSchema>
 
 // Start Middleware
 server.use(cors())
@@ -48,10 +34,10 @@ server.post('/api/v1/upload', upload.single('file'), async (
     const file = req.file
     fs.readFile(`./uploads/${file?.filename}`, (err, pdfBuffer) => {
       if (err) console.error('Error reading file:', err.message)
-      pdf(pdfBuffer).then(async data => {
+      pdf(pdfBuffer).then(async (data) => {
         console.log(data.text)
-        const results = await savePDFAsText({ content: data.text })
-        res.status(200).json({ txt: results })
+        const pdf_text = await savePDFAsText({ content: data.text })
+        res.status(201).json({ pdf_text })
       })
     })
   } catch (error) {
@@ -62,7 +48,7 @@ server.post('/api/v1/upload', upload.single('file'), async (
   }
 })
 
-server.post('/api/v1/chat', validateInput(chatInputSchema), async (
+server.post('/api/v1/chat', validateInput(chatSchema), async (
   req: Request<{}, {}, ChatInput['body']>,
   res: Response
 ) => {
