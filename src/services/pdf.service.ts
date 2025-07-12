@@ -1,12 +1,12 @@
 import mongoose, { InferSchemaType } from 'mongoose'
 
-type DocumentType = InferSchemaType<typeof documentSchema>
+type DocumentType = InferSchemaType<typeof pdfSchema>
 
-const documentSchema = new mongoose.Schema({
+const pdfSchema = new mongoose.Schema({
   content: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 })
 
 export async function savePDFAsText(data: DocumentType) {
@@ -14,4 +14,4 @@ export async function savePDFAsText(data: DocumentType) {
   return pdf_doc
 }
 
-export const PDFDocument = mongoose.model('PDFToTextDocument', documentSchema)
+export const PDFDocument = mongoose.model('UploadedPDF', pdfSchema)

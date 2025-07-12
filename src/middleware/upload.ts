@@ -4,7 +4,7 @@ import fs from 'fs-extra'
 import { Request } from 'express'
 
 const storage = multer.diskStorage({
-  destination: function(
+  destination: function (
     _req: Request,
     _file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
@@ -13,12 +13,16 @@ const storage = multer.diskStorage({
     fs.ensureDirSync(uploadDir)
     cb(null, uploadDir)
   },
-  filename: function(_req, file, cb) {
+  filename: function (_req, file, cb) {
     cb(null, `Doc${'-'}${Date.now() + path.extname(file.originalname)}`)
-  }
+  },
 })
 
-const fileFilter = (_req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
+const fileFilter = (
+  _req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback
+) => {
   if (file.fieldname === 'file') {
     const allowedFileTypes = /pdf/
     const extension = path.extname(file.originalname).toLowerCase()

@@ -9,16 +9,16 @@ const markdownSchema = new mongoose.Schema({
   title: String,
   content: {
     type: String,
-    required: true
+    required: true,
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updatedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 })
 
 export const MarkdownDoc = mongoose.model('MarkdownDoc', markdownSchema)

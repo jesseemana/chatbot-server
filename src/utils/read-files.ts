@@ -33,12 +33,11 @@ const processMarkdownFile = async (filePath: string) => {
       return {
         success: true,
         filename,
-        operation: 'create'
+        operation: 'create',
       }
     }
-
   } catch (error) {
-    console.error(`Error processing file ${filePath}:`, error);
+    console.error(`Error processing file ${filePath}:`, error)
     return {
       success: false,
       filename: path.basename(filePath),
@@ -63,9 +62,9 @@ async function processMarkdownDirectory(directoryPath: string) {
 
     return {
       success: true,
-      processed: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length,
-      details: results
+      processed: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length,
+      details: results,
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
