@@ -51,7 +51,7 @@ server.post(
 
 // Chat with OpenAI API route
 server.post(
-  '/api/v1/chat/openai',
+  '/api/v1/chat',
   validateInput(chatSchema),
   async (req: Request<{}, {}, ChatInput['body']>, res: Response) => {
     try {
@@ -76,6 +76,7 @@ server.post(
  * Main function that starts the express server.
  */
 function main(): void {
+  // TODO: add graceful shutdowns in the future.
   server.listen(PORT, async () => {
     await connectDatabase()
     console.log(`server started on http://localhost:${PORT}`)
